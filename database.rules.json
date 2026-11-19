@@ -1,0 +1,17 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": "auth != null && (auth.token.email == 'ORGANISER1@example.com' || auth.token.email == 'ORGANISER2@example.com')",
+    "awards": {
+      "$id": {
+        ".validate": "newData.hasChildren(['team','amount','t']) && newData.child('team').val().matches(/^(orange|blue|pink|purple)$/) && newData.child('amount').isNumber() && newData.child('amount').val() >= -100000 && newData.child('amount').val() <= 100000"
+      }
+    },
+    "teams": {
+      "$team": {
+        ".validate": "$team.matches(/^(orange|blue|pink|purple)$/)",
+        "name": { ".validate": "newData.isString() && newData.val().length <= 40" }
+      }
+    }
+  }
+}

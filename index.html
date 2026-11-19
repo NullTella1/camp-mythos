@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camp Mythos — Empire Points</title>
+<meta name="description" content="Live empire standings for Camp Mythos, Culture & Identity Camp 2026 (15–17 Dec).">
+<meta property="og:title" content="Camp Mythos — Empire Points">
+<meta property="og:image" content="assets/main.png">
+<link rel="icon" href="assets/main.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Pirata+One&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0b0e; --panel:rgba(22,19,24,.82); --line:rgba(255,255,255,.10);
+    --ink:#f4efe8; --muted:#a79f97; --red:#c8202b;
+    --orange:#f47b20; --blue:#1eb8d9; --pink:#f25cd8; --purple:#6a3cf0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Cormorant Garamond",Georgia,serif;font-size:18px}
+  body{min-height:100vh;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(200,32,43,.18), transparent 60%),
+      var(--bg);}
+  .hero{position:relative;overflow:hidden;padding:34px 20px 26px;text-align:center;border-bottom:1px solid var(--line)}
+  .hero::before{content:"";position:absolute;inset:0;background:url(assets/hero.jpg) center 30%/cover no-repeat;filter:blur(3px) saturate(1.1) brightness(.42);transform:scale(1.08)}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,11,14,.15),rgba(13,11,14,.55) 60%,var(--bg))}
+  .hero>*{position:relative;z-index:1}
+  .kicker{font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:#e9e2d8;opacity:.9}
+  h1{font-family:"UnifrakturCook","Pirata One",serif;font-weight:700;font-size:clamp(46px,9vw,92px);line-height:.95;margin:8px 0 4px;letter-spacing:.01em;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+  .dates{font-family:"Pirata One",serif;font-size:clamp(20px,3vw,28px);color:#ffdede;letter-spacing:.06em}
+  .crest{width:clamp(110px,16vw,160px);height:auto;display:block;margin:14px auto 6px;filter:drop-shadow(0 6px 24px rgba(0,0,0,.6))}
+  .tagline{font-style:italic;color:#d9d1c7;font-size:19px;margin-top:4px}
+  .status{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.35);font-size:15px;color:var(--muted)}
+  .dot{width:9px;height:9px;border-radius:50%;background:#666}
+  .dot.live{background:#3ddc84;box-shadow:0 0 0 0 rgba(61,220,132,.6);animation:pulse 2s infinite}
+  .dot.warn{background:#e8b43a}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,220,132,.55)}70%{box-shadow:0 0 0 10px rgba(61,220,132,0)}100%{box-shadow:0 0 0 0 rgba(61,220,132,0)}}
+
+  main{max-width:1100px;margin:0 auto;padding:26px 18px 60px}
+  .section-title{font-family:"Pirata One",serif;font-size:28px;letter-spacing:.04em;margin:8px 0 14px;display:flex;align-items:center;gap:12px}
+  .section-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+  .board{display:flex;flex-direction:column;gap:14px}
+  .card{--c:#fff;position:relative;display:grid;grid-template-columns:56px 96px 1fr auto;align-items:center;gap:16px;
+    padding:16px 22px 16px 16px;border-radius:16px;background:var(--panel);border:1px solid var(--line);
+    box-shadow:inset 4px 0 0 var(--c), 0 10px 30px rgba(0,0,0,.25);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+  .card.first{border-color:color-mix(in srgb,var(--c) 55%,transparent);box-shadow:inset 4px 0 0 var(--c),0 0 0 1px color-mix(in srgb,var(--c) 30%,transparent),0 14px 40px color-mix(in srgb,var(--c) 22%,transparent)}
+  .rank{font-family:"Pirata One",serif;font-size:40px;text-align:center;color:var(--muted)}
+  .card.first .rank{color:#f3c96b}
+  .logo{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 4px 14px color-mix(in srgb,var(--c) 40%,transparent))}
+  .info{min-width:0}
+  .tname{font-family:"Pirata One",serif;font-size:clamp(24px,3.4vw,34px);line-height:1.05;overflow-wrap:anywhere}
+  .tsub{font-size:15px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+  .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.07);margin-top:10px;overflow:hidden}
+  .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 70%,#000),var(--c));border-radius:99px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+  .pts{text-align:right;font-family:"Pirata One",serif;font-variant-numeric:tabular-nums}
+  .pts b{display:block;font-weight:400;font-size:clamp(40px,6vw,60px);line-height:1;color:var(--c)}
+  .pts small{font-family:"Cormorant Garamond",serif;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .bump{position:absolute;right:24px;top:-10px;font-family:"Pirata One",serif;font-size:26px;color:var(--c);pointer-events:none;animation:bump 1.8s ease-out forwards}
+  .bump.neg{color:#ff7b7b}
+  @keyframes bump{0%{opacity:0;transform:translateY(14px) scale(.8)}15%{opacity:1;transform:translateY(0) scale(1.1)}100%{opacity:0;transform:translateY(-26px) scale(1)}}
+  .card.flash{animation:flash 1.2s ease-out}
+  @keyframes flash{0%{background:color-mix(in srgb,var(--c) 26%,var(--panel))}100%{background:var(--panel)}}
+
+  .feed{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+  .feed li{display:grid;grid-template-columns:10px 1fr auto auto;gap:12px;align-items:center;padding:11px 16px;border-top:1px solid var(--line);font-size:17px}
+  .feed li:first-child{border-top:0}
+  .feed .sw{width:10px;height:10px;border-radius:50%}
+  .feed .amt{font-family:"Pirata One",serif;font-size:21px;font-variant-numeric:tabular-nums}
+  .feed .when{color:var(--muted);font-size:14px;white-space:nowrap}
+  .feed .reason{color:var(--muted)}
+  .feed .empty{display:block;color:var(--muted);text-align:center;padding:22px;font-style:italic}
+  .undo{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;font:inherit;font-size:13px;padding:3px 9px;cursor:pointer}
+  .undo:hover{color:#ff8b8b;border-color:#ff8b8b}
+
+  .notice{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:18px 20px;color:var(--muted);text-align:center;margin-bottom:18px}
+
+  /* admin */
+  .admin-toggle{position:fixed;right:16px;bottom:16px;z-index:20;font-family:"Pirata One",serif;font-size:19px;letter-spacing:.04em;
+    background:var(--red);color:#fff;border:0;border-radius:999px;padding:10px 20px;cursor:pointer;box-shadow:0 8px 24px rgba(200,32,43,.35)}
+  .admin{display:none;margin-bottom:30px;padding:20px;border-radius:18px;border:1px solid rgba(200,32,43,.45);background:linear-gradient(180deg,rgba(200,32,43,.10),rgba(22,19,24,.9))}
+  body.admin-on .admin{display:block}
+  .admin-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+  .admin-head h2{font-family:"Pirata One",serif;font-weight:400;font-size:28px;margin:0}
+  .admin-head p{margin:2px 0 0;color:var(--muted);font-size:16px}
+  .agrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .acard{--c:#fff;border:1px solid var(--line);border-top:3px solid var(--c);border-radius:14px;padding:14px;background:rgba(0,0,0,.25)}
+  .acard .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .acard img{width:44px;height:44px;object-fit:contain}
+  .acard .total{margin-left:auto;font-family:"Pirata One",serif;font-size:30px;color:var(--c);font-variant-numeric:tabular-nums}
+  label.l{display:block;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
+  input[type=text],input[type=number]{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:inherit;font-size:17px;padding:8px 10px;outline:none}
+  input:focus{border-color:var(--c, #fff)}
+  .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+  .btn{font:inherit;font-weight:700;font-size:16px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);padding:8px 0;cursor:pointer;transition:background .15s, transform .05s}
+  .btn:hover{background:rgba(255,255,255,.12)}
+  .btn:active{transform:translateY(1px)}
+  .btn.plus{border-color:color-mix(in srgb,var(--c) 50%,transparent);color:var(--c)}
+  .btn.minus{color:#ff9a9a}
+  .btn:disabled{opacity:.45;cursor:default}
+  .custom{display:grid;grid-template-columns:80px 1fr;gap:6px;margin-top:8px}
+  .award{width:100%;margin-top:8px;background:var(--c);color:#111;border:0}
+  .award:hover{background:color-mix(in srgb,var(--c) 85%,#fff)}
+  .ghost{background:none;border:1px solid var(--line);color:var(--muted);font:inherit;font-size:15px;border-radius:10px;padding:7px 12px;cursor:pointer}
+  .ghost:hover{color:#ff8b8b;border-color:#ff8b8b}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);opacity:0;background:#1d1a20;border:1px solid var(--line);padding:10px 18px;border-radius:12px;transition:.25s;z-index:30;font-size:16px}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:40}
+  .modal-bg.show{display:flex}
+  .modal{background:#1a171c;border:1px solid var(--line);border-radius:16px;padding:22px;max-width:380px;margin:16px}
+  .modal h3{font-family:"Pirata One",serif;font-weight:400;font-size:26px;margin:0 0 8px}
+  .modal p{color:var(--muted);margin:0 0 16px}
+  .modal .row{display:flex;gap:8px;justify-content:flex-end}
+  .danger{background:var(--red);color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;padding:8px 16px;cursor:pointer}
+  .admin-login{max-width:420px;margin:0 auto 30px;padding:22px;border-radius:18px;border:1px solid rgba(200,32,43,.45);background:linear-gradient(180deg,rgba(200,32,43,.10),rgba(22,19,24,.9))}
+  .admin-login h2{font-family:"Pirata One",serif;font-weight:400;font-size:28px;margin:0}
+  .admin-login p{color:var(--muted);margin:2px 0 6px}
+  input[type=password]{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:inherit;font-size:17px;padding:8px 10px;outline:none}
+  footer{text-align:center;color:var(--muted);font-size:15px;font-style:italic;padding:10px 0 30px}
+
+  @media (max-width:640px){
+    .card{grid-template-columns:34px 64px 1fr auto;gap:10px;padding:12px 14px 12px 10px}
+    .rank{font-size:28px}
+    .logo{width:64px;height:64px}
+    .feed li{grid-template-columns:10px 1fr auto;}
+    .feed .when{display:none}
+  }
+</style>
+</head>
+<body data-mode="view">
+  <header class="hero">
+    <div class="kicker">Culture &amp; Identity Camp 2026</div>
+    <h1>Camp Mythos</h1>
+    <div class="dates">15 – 17 December</div>
+    <img class="crest" src="assets/main.png" alt="Camp Mythos crest">
+    <div class="tagline">4 Empires, 4 Unwritten Kingdoms. Dare to step into the unknown?</div>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusText">Connecting to the war table…</span></div>
+  </header>
+
+  <main>
+    
+
+    <div id="notice" class="notice" hidden></div>
+
+    <div class="section-title">Empire Standings</div>
+    <div class="board" id="board"></div>
+
+    <div class="section-title" style="margin-top:34px">Chronicle of Deeds</div>
+    <ul class="feed" id="feed"><li><span class="empty">No points awarded yet. The tale is unwritten.</span></li></ul>
+  </main>
+  <footer>Camp Mythos · Temasek Polytechnic · 15–17 Dec 2026</footer>
+
+  <div class="toast" id="toast"></div>
+  
+
+<script src="firebase-config.js"></script>
+<script>
+(() => {
+  const IS_ADMIN = document.body.dataset.mode === "admin";
+  const TEAMS = [
+    { id:"orange", color:"var(--orange)", hex:"#f47b20", label:"Orange Empire", logo:"assets/orange.png" },
+    { id:"blue",   color:"var(--blue)",   hex:"#1eb8d9", label:"Blue Empire",   logo:"assets/blue.png" },
+    { id:"pink",   color:"var(--pink)",   hex:"#f25cd8", label:"Pink Empire",   logo:"assets/pink.png" },
+    { id:"purple", color:"var(--purple)", hex:"#6a3cf0", label:"Purple Empire", logo:"assets/purple.png" },
+  ];
+  const byId = Object.fromEntries(TEAMS.map(t => [t.id, t]));
+  const $ = s => document.querySelector(s);
+
+  const state = { names:{}, awards:[], resetAt:0, ready:false, canEdit:false };
+  let prevTotals = null;
+  let db = null;
+
+  /* ---------- helpers ---------- */
+  const nameOf = id => (state.names[id] || "").trim() || byId[id].label;
+  function totals(){
+    const t = Object.fromEntries(TEAMS.map(x => [x.id, 0]));
+    for (const a of activeAwards()) if (t[a.team] !== undefined) t[a.team] += a.amount;
+    return t;
+  }
+  function activeAwards(){
+    return state.awards.filter(a => a.t > state.resetAt && byId[a.team] && Number.isFinite(a.amount));
+  }
+  function ago(t){
+    const s = Math.max(0, (Date.now() - t) / 1000);
+    if (s < 45) return "just now";
+    if (s < 3600) return Math.round(s/60) + " min ago";
+    if (s < 86400) return Math.round(s/3600) + " h ago";
+    return new Date(t).toLocaleDateString(undefined,{day:"numeric",month:"short"}) + " " +
+           new Date(t).toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});
+  }
+  function toast(msg){
+    const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+  }
+  function setStatus(kind, text){
+    $("#dot").className = "dot " + (kind || "");
+    $("#statusText").textContent = text;
+  }
+
+  /* ---------- scoreboard ---------- */
+  const board = $("#board");
+  const cards = {};
+  for (const t of TEAMS){
+    const el = document.createElement("div");
+    el.className = "card"; el.style.setProperty("--c", t.color);
+    el.innerHTML = `<div class="rank">–</div>
+      <img class="logo" alt="">
+      <div class="info"><div class="tname"></div><div class="tsub"></div><div class="bar"><span></span></div></div>
+      <div class="pts"><b>0</b><small>points</small></div>`;
+    el.querySelector(".logo").src = t.logo;
+    el.querySelector(".logo").alt = t.label + " crest";
+    el.querySelector(".tsub").textContent = t.id + " empire";
+    board.appendChild(el);
+    cards[t.id] = el;
+  }
+
+  function renderBoard(){
+    const tot = totals();
+    const order = TEAMS.map(t => t.id).sort((a,b) => tot[b] - tot[a] || TEAMS.findIndex(t=>t.id===a) - TEAMS.findIndex(t=>t.id===b));
+    const max = Math.max(1, ...Object.values(tot).map(v => Math.max(0,v)));
+    // FLIP animation for reordering
+    const before = {}; for (const id of order) before[id] = cards[id].getBoundingClientRect().top;
+    let rank = 0, last = null;
+    order.forEach((id, i) => {
+      if (tot[id] !== last){ rank = i + 1; last = tot[id]; }
+      const el = cards[id];
+      el.querySelector(".rank").textContent = state.ready ? rank : "–";
+      el.querySelector(".tname").textContent = nameOf(id);
+      el.querySelector(".tsub").style.display = (state.names[id]||"").trim() ? "" : "none";
+      el.querySelector(".pts b").textContent = tot[id].toLocaleString();
+      el.querySelector(".bar span").style.width = (Math.max(0,tot[id]) / max * 100) + "%";
+      el.classList.toggle("first", state.ready && rank === 1 && tot[id] > 0);
+      board.appendChild(el);
+    });
+    for (const id of order){
+      const dy = before[id] - cards[id].getBoundingClientRect().top;
+      if (dy){
+        cards[id].style.transition = "none";
+        cards[id].style.transform = `translateY(${dy}px)`;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          cards[id].style.transition = ""; cards[id].style.transform = "";
+        }));
+      }
+    }
+    // bumps
+    if (prevTotals && state.ready){
+      for (const t of TEAMS){
+        const d = tot[t.id] - prevTotals[t.id];
+        if (d){
+          const b = document.createElement("div");
+          b.className = "bump" + (d < 0 ? " neg" : "");
+          b.textContent = (d > 0 ? "+" : "−") + Math.abs(d);
+          cards[t.id].appendChild(b);
+          cards[t.id].classList.remove("flash"); void cards[t.id].offsetWidth; cards[t.id].classList.add("flash");
+          setTimeout(() => b.remove(), 1900);
+        }
+      }
+    }
+    if (state.ready) prevTotals = tot;
+  }
+
+  function renderFeed(){
+    const feed = $("#feed");
+    const list = activeAwards().sort((a,b) => b.t - a.t).slice(0, 40);
+    feed.textContent = "";
+    if (!list.length){
+      feed.innerHTML = `<li><span class="empty">No points awarded yet. The tale is unwritten.</span></li>`;
+      return;
+    }
+    for (const a of list){
+      const li = document.createElement("li");
+      const sw = document.createElement("span"); sw.className = "sw"; sw.style.background = byId[a.team].hex;
+      const txt = document.createElement("span");
+      const strong = document.createElement("strong"); strong.textContent = nameOf(a.team);
+      txt.appendChild(strong);
+      if (a.reason){ const r = document.createElement("span"); r.className = "reason"; r.textContent = " · " + a.reason; txt.appendChild(r); }
+      const amt = document.createElement("span"); amt.className = "amt";
+      amt.textContent = (a.amount >= 0 ? "+" : "−") + Math.abs(a.amount);
+      amt.style.color = a.amount >= 0 ? byId[a.team].hex : "#ff8b8b";
+      const when = document.createElement("span"); when.className = "when"; when.textContent = ago(a.t);
+      li.append(sw, txt, amt, when);
+      if (state.canEdit){
+        const u = document.createElement("button"); u.className = "undo"; u.textContent = "Undo";
+        u.title = "Remove this award";
+        u.onclick = () => removeAward(a.id, u);
+        li.style.gridTemplateColumns = "10px 1fr auto auto auto";
+        li.appendChild(u);
+      }
+      feed.appendChild(li);
+    }
+  }
+
+  function renderAdminTotals(){
+    const tot = totals();
+    for (const t of TEAMS){
+      const el = document.querySelector(`.acard[data-team="${t.id}"] .total`);
+      if (el) el.textContent = tot[t.id].toLocaleString();
+      const inp = document.querySelector(`.acard[data-team="${t.id}"] .nm`);
+      if (inp && document.activeElement !== inp) inp.value = state.names[t.id] || "";
+    }
+  }
+  function renderAll(){ renderBoard(); renderFeed(); renderAdminTotals(); }
+  renderAll();
+  setInterval(renderFeed, 30000);
+
+  /* ---------- admin panel ---------- */
+  function buildAdmin(){
+    const g = $("#agrid"); g.textContent = "";
+    for (const t of TEAMS){
+      const c = document.createElement("div");
+      c.className = "acard"; c.dataset.team = t.id; c.style.setProperty("--c", t.color);
+      c.innerHTML = `
+        <div class="top"><img alt=""><div style="font-family:'Pirata One',serif;font-size:20px;text-transform:capitalize">${t.id}</div><div class="total">0</div></div>
+        <label class="l">Empire name</label>
+        <input type="text" class="nm" maxlength="40">
+        <div class="quick">
+          <button class="btn plus" data-amt="5">+5</button>
+          <button class="btn plus" data-amt="10">+10</button>
+          <button class="btn plus" data-amt="20">+20</button>
+          <button class="btn plus" data-amt="50">+50</button>
+          <button class="btn minus" data-amt="-5">−5</button>
+          <button class="btn minus" data-amt="-10">−10</button>
+          <button class="btn minus" data-amt="-20">−20</button>
+          <button class="btn minus" data-amt="-50">−50</button>
+        </div>
+        <label class="l">Custom award</label>
+        <div class="custom"><input type="number" class="camt" placeholder="pts" step="1"><input type="text" class="reason" placeholder="Reason (optional)" maxlength="80"></div>
+        <button class="btn award">Award points</button>`;
+      c.querySelector("img").src = t.logo;
+      const nm = c.querySelector(".nm");
+      nm.placeholder = t.label;
+      nm.value = state.names[t.id] || "";
+      nm.addEventListener("blur", () => setName(t.id, nm.value));
+      nm.addEventListener("keydown", e => { if (e.key === "Enter") nm.blur(); });
+      c.querySelectorAll(".quick .btn").forEach(b => b.addEventListener("click", () => {
+        addAward(t.id, Number(b.dataset.amt), c.querySelector(".reason").value.trim(), b);
+      }));
+      c.querySelector(".award").addEventListener("click", e => {
+        const amt = Math.round(Number(c.querySelector(".camt").value));
+        if (!amt){ toast("Type a point amount first (use − for deductions)"); return; }
+        addAward(t.id, amt, c.querySelector(".reason").value.trim(), e.currentTarget, () => { c.querySelector(".camt").value = ""; });
+      });
+      g.appendChild(c);
+    }
+    renderAdminTotals();
+  }
+
+  let rtdb = null, auth = null, FB = null;
+
+  function denied(e){
+    const code = String(e && (e.code || e.message) || "");
+    if (/permission/i.test(code)){ toast("This account isn't allowed to edit points."); return true; }
+    return false;
+  }
+  async function addAward(team, amount, reason, btn, done){
+    if (!rtdb || !state.canEdit) return;
+    btn && (btn.disabled = true);
+    try{
+      await FB.push(FB.ref(rtdb, "awards"), { team, amount, reason: reason || "", t: Date.now() });
+      const r = document.querySelector(`.acard[data-team="${team}"] .reason`); if (r) r.value = "";
+      toast(`${amount > 0 ? "+" : "−"}${Math.abs(amount)} to ${nameOf(team)}`);
+      done && done();
+    }catch(e){ if (!denied(e)) toast("Couldn't save. Check your connection and try again."); }
+    finally{ btn && (btn.disabled = false); }
+  }
+  async function removeAward(id, btn){
+    if (!rtdb) return;
+    btn.disabled = true;
+    try{ await FB.remove(FB.ref(rtdb, "awards/" + id)); toast("Award removed"); }
+    catch(e){ if (!denied(e)) toast("Couldn't remove. Try again."); btn.disabled = false; }
+  }
+  async function setName(team, value){
+    value = value.trim().slice(0,40);
+    if ((state.names[team] || "") === value || !rtdb) return;
+    try{ await FB.set(FB.ref(rtdb, "teams/" + team + "/name"), value); toast("Name saved"); }
+    catch(e){ if (!denied(e)) toast("Couldn't save the name."); }
+  }
+
+  if (IS_ADMIN){
+  $("#resetBtn").onclick = () => $("#modal").classList.add("show");
+  $("#cancelReset").onclick = () => $("#modal").classList.remove("show");
+  $("#confirmReset").onclick = async () => {
+    $("#modal").classList.remove("show");
+    if (!rtdb) return;
+    try{
+      await FB.remove(FB.ref(rtdb, "awards"));
+      toast("All points reset to 0");
+    }catch(e){ if (!denied(e)) toast("Couldn't reset. Try again."); }
+  };
+
+  }
+
+  /* ---------- login (admin page only) ---------- */
+  function showLogin(on){
+    $("#login").hidden = !on;
+    document.body.classList.toggle("admin-on", !on);
+    state.canEdit = !on;
+    renderFeed();
+  }
+  if (IS_ADMIN){
+    $("#loginForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      if (!auth) return;
+      const btn = $("#loginBtn"); btn.disabled = true; $("#loginErr").textContent = "";
+      try{
+        await FB.signInWithEmailAndPassword(auth, $("#email").value.trim(), $("#password").value);
+      }catch(err){
+        $("#loginErr").textContent = /invalid|wrong|not-found|credential/i.test(err.code || "") ? "Wrong email or password." :
+          /too-many/i.test(err.code || "") ? "Too many tries. Wait a minute and try again." : "Couldn't sign in. Check your connection.";
+      }finally{ btn.disabled = false; }
+    });
+    $("#signOut").onclick = () => auth && FB.signOut(auth);
+  }
+
+  /* ---------- connect ---------- */
+  async function start(){
+    const cfg = window.FIREBASE_CONFIG;
+    if (!cfg || !cfg.apiKey || String(cfg.apiKey).includes("PASTE")){
+      setStatus("warn", "Setup needed");
+      const n = $("#notice"); n.hidden = false;
+      n.textContent = "The scoreboard isn't connected to its database yet. Organisers: add your Firebase settings to firebase-config.js.";
+      if (IS_ADMIN) $("#login").hidden = true;
+      return;
+    }
+    const V = "10.12.5";
+    const [app, dbm, am] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`),
+      IS_ADMIN ? import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`) : Promise.resolve({}),
+    ]);
+    FB = { ...dbm, ...am };
+    const fbApp = app.initializeApp(cfg);
+    rtdb = dbm.getDatabase(fbApp);
+
+    if (IS_ADMIN){
+      buildAdmin();
+      auth = am.getAuth(fbApp);
+      am.onAuthStateChanged(auth, u => {
+        $("#who").textContent = u ? u.email : "";
+        showLogin(!u);
+      });
+    }
+
+    const timer = setTimeout(() => setStatus("warn", state.ready ? "Connection slow, scores may be out of date" : "Can't reach the scoreboard yet…"), 10000);
+    dbm.onValue(dbm.ref(rtdb, ".info/connected"), s => {
+      if (!state.ready) return;
+      s.val() ? setStatus("live", "Live · updates automatically") : setStatus("warn", "Reconnecting…");
+    });
+    dbm.onValue(dbm.ref(rtdb, "/"), snap => {
+      const v = snap.val() || {};
+      const aw = v.awards || {};
+      state.awards = Object.keys(aw).map(id => {
+        const x = aw[id] || {};
+        return { id, team: String(x.team || ""), amount: Math.round(Number(x.amount)), reason: typeof x.reason === "string" ? x.reason.slice(0,80) : "", t: Number(x.t) || 0 };
+      });
+      const n = {};
+      for (const id of Object.keys(v.teams || {})){ const nm = v.teams[id] && v.teams[id].name; if (byId[id] && typeof nm === "string") n[id] = nm.slice(0,40); }
+      state.names = n;
+      state.resetAt = 0;
+      clearTimeout(timer);
+      state.ready = true;
+      setStatus("live", "Live · updates automatically");
+      renderAll();
+    }, err => { clearTimeout(timer); setStatus("warn", "Can't load scores right now"); console.error(err); });
+  }
+  start().catch(e => { console.error(e); setStatus("warn", "Couldn't load the scoreboard"); });
+})();
+</script>
+</body>
+</html>
